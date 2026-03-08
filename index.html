@@ -784,22 +784,23 @@
   <div class="model-section">
     <div class="model-label">Pilih Model</div>
     <select class="model-select" id="model-select" onchange="onModelChange()">
-      <optgroup label="Google (Gemini)">
-        <option value="gemini-2.0-flash" selected>Gemini 2.0 Flash ⚡</option>
-        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-      </optgroup>
-      <optgroup label="Groq (LLaMA / Mixtral)">
-        <option value="llama-3.3-70b">LLaMA 3.3 70B</option>
+      <optgroup label="⚡ Groq (Gratis + Cepat)">
+        <option value="llama-3.3-70b" selected>LLaMA 3.3 70B 🔥</option>
+        <option value="llama-3.1-70b">LLaMA 3.1 70B</option>
         <option value="llama-3.1-8b">LLaMA 3.1 8B Fast ⚡</option>
-        <option value="mixtral-8x7b">Mixtral 8x7B</option>
+        <option value="deepseek-r1-distill">DeepSeek R1 Distill</option>
+        <option value="gemma2-9b">Gemma 2 9B</option>
       </optgroup>
-      <optgroup label="OpenRouter">
-        <option value="deepseek-r1">DeepSeek R1 🆓</option>
-        <option value="mistral-7b">Mistral 7B 🆓</option>
+      <optgroup label="🌟 Google Gemini">
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash ⚡</option>
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
       </optgroup>
-      <optgroup label="Cohere">
-        <option value="command-r-plus">Command R+</option>
-        <option value="command-r">Command R</option>
+      <optgroup label="🆓 OpenRouter (Gratis)">
+        <option value="deepseek-r1-free">DeepSeek R1 🆓</option>
+        <option value="meta-llama-free">Llama 3.1 405B 🆓</option>
+      </optgroup>
+      <optgroup label="🤝 Cohere">
+        <option value="command-a">Command A</option>
       </optgroup>
     </select>
     <div id="model-badge" class="model-badge badge-claude">
@@ -957,18 +958,19 @@
 
   // MODEL CONFIG
   const MODELS = {
-    'gemini-2.0-flash': { name: 'Gemini 2.0 Flash',   badge: 'badge-gemini',   provider: 'gemini',     apiModel: 'gemini-2.0-flash' },
-    'gemini-1.5-pro':   { name: 'Gemini 1.5 Pro',     badge: 'badge-gemini',   provider: 'gemini',     apiModel: 'gemini-1.5-pro' },
-    'llama-3.3-70b':    { name: 'LLaMA 3.3 70B',      badge: 'badge-deepseek', provider: 'groq',       apiModel: 'llama-3.3-70b-versatile' },
-    'llama-3.1-8b':     { name: 'LLaMA 3.1 8B Fast',  badge: 'badge-deepseek', provider: 'groq',       apiModel: 'llama-3.1-8b-instant' },
-    'mixtral-8x7b':     { name: 'Mixtral 8x7B',       badge: 'badge-gpt',      provider: 'groq',       apiModel: 'mixtral-8x7b-32768' },
-    'deepseek-r1':      { name: 'DeepSeek R1',         badge: 'badge-deepseek', provider: 'openrouter', apiModel: 'deepseek/deepseek-r1:free' },
-    'mistral-7b':       { name: 'Mistral 7B',          badge: 'badge-gpt',      provider: 'openrouter', apiModel: 'mistralai/mistral-7b-instruct:free' },
-    'command-r-plus':   { name: 'Command R+',          badge: 'badge-claude',   provider: 'cohere',     apiModel: 'command-r-plus' },
-    'command-r':        { name: 'Command R',            badge: 'badge-claude',   provider: 'cohere',     apiModel: 'command-r' },
+    'llama-3.3-70b':       { name: 'LLaMA 3.3 70B',        badge: 'badge-deepseek', provider: 'groq',       apiModel: 'llama-3.3-70b-versatile' },
+    'llama-3.1-8b':        { name: 'LLaMA 3.1 8B Fast',    badge: 'badge-deepseek', provider: 'groq',       apiModel: 'llama-3.1-8b-instant' },
+    'llama-3.1-70b':       { name: 'LLaMA 3.1 70B',        badge: 'badge-deepseek', provider: 'groq',       apiModel: 'llama-3.1-70b-versatile' },
+    'gemma2-9b':           { name: 'Gemma 2 9B',           badge: 'badge-gemini',   provider: 'groq',       apiModel: 'gemma2-9b-it' },
+    'deepseek-r1-distill': { name: 'DeepSeek R1 Distill',  badge: 'badge-deepseek', provider: 'groq',       apiModel: 'deepseek-r1-distill-llama-70b' },
+    'gemini-1.5-flash':    { name: 'Gemini 1.5 Flash',     badge: 'badge-gemini',   provider: 'gemini',     apiModel: 'gemini-1.5-flash' },
+    'gemini-2.0-flash':    { name: 'Gemini 2.0 Flash',     badge: 'badge-gemini',   provider: 'gemini',     apiModel: 'gemini-2.0-flash' },
+    'deepseek-r1-free':    { name: 'DeepSeek R1',          badge: 'badge-deepseek', provider: 'openrouter', apiModel: 'deepseek/deepseek-r1:free' },
+    'meta-llama-free':     { name: 'Llama 3.1 405B',       badge: 'badge-deepseek', provider: 'openrouter', apiModel: 'meta-llama/llama-3.1-405b-instruct:free' },
+    'command-a':           { name: 'Command A',            badge: 'badge-claude',   provider: 'cohere',     apiModel: 'command-a-03-2025' },
   };
 
-  let currentModel = 'gemini-2.0-flash';
+  let currentModel = 'llama-3.3-70b';
   let conversationHistory = [];
 
   // ─── AUTH GUARD ───
@@ -1083,7 +1085,7 @@
 
     const chatDoc = await getDoc(doc(db, 'users', currentUser.uid, 'chats', chatId));
     if (chatDoc.exists()) {
-      const m = chatDoc.data().model || 'gemini-2.0-flash';
+      const m = chatDoc.data().model || 'llama-3.3-70b';
       document.getElementById('model-select').value = m;
       onModelChange(m);
     }
@@ -1100,98 +1102,165 @@
       createdAt: serverTimestamp()
     });
     const preview = content.substring(0, 40) + (content.length > 40 ? '...' : '');
-    await setDoc(doc(db, 'users', currentUser.uid, 'chats', currentChatId), {
-      updatedAt: serverTimestamp(),
-      title: role === 'user' ? preview : undefined
-    }, { merge: true });
+    const chatUpdate = { updatedAt: serverTimestamp() };
+    if (role === 'user') chatUpdate.title = preview;
+    await setDoc(doc(db, 'users', currentUser.uid, 'chats', currentChatId), chatUpdate, { merge: true });
     await loadChatHistory();
     setActiveHistory(currentChatId);
   }
 
   // AI CALL
   async function callAI(messages, model) {
-    const config = MODELS[model] || MODELS['gemini-2.0-flash'];
-    const systemPrompt = `Kamu adalah ${config.name}, AI asisten cerdas dari NexusAI. Bantu berbagai tugas: coding, analisis, menulis, matematika, dan lainnya. Gunakan Bahasa Indonesia yang ramah. Untuk kode gunakan markdown code blocks. Untuk HTML hasilkan kode lengkap siap pakai.`;
+    const config = MODELS[model];
+    if (!config) throw new Error(`Model "${model}" tidak ditemukan`);
+
+    console.log('[NexusAI] Calling provider:', config.provider, '| model:', config.apiModel);
+
+    const systemPrompt = `Kamu adalah ${config.name}, AI asisten cerdas dari NexusAI. Bantu berbagai tugas: coding, analisis, menulis, matematika, dan lainnya. Gunakan Bahasa Indonesia yang ramah dan natural. Untuk kode gunakan markdown code blocks dengan nama bahasa. Untuk HTML hasilkan kode lengkap dan siap pakai.`;
 
     // ── GEMINI ──
     if (config.provider === 'gemini') {
-      const geminiMessages = messages.map(m => ({
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.apiModel}:generateContent?key=${KEYS.gemini}`;
+      // Gemini tidak boleh ada 2 pesan dari role yang sama berturut-turut, gabungkan jika perlu
+      const raw = messages.map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }]
       }));
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.apiModel}:generateContent?key=${KEYS.gemini}`;
+      // Deduplicate consecutive same roles
+      const geminiMsgs = [];
+      for (const msg of raw) {
+        const last = geminiMsgs[geminiMsgs.length - 1];
+        if (last && last.role === msg.role) {
+          last.parts[0].text += '
+' + msg.parts[0].text;
+        } else {
+          geminiMsgs.push({...msg, parts: [{text: msg.parts[0].text}]});
+        }
+      }
+      // Must start with user
+      if (geminiMsgs.length > 0 && geminiMsgs[0].role !== 'user') {
+        geminiMsgs.unshift({ role: 'user', parts: [{ text: '.' }] });
+      }
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: geminiMessages,
+          contents: geminiMsgs,
           generationConfig: { maxOutputTokens: 4096, temperature: 0.7 }
         })
       });
-      if (!res.ok) { const eText = await res.text(); let eMsg=`Gemini Error ${res.status}`; try{const e=JSON.parse(eText);eMsg=e.error?.message||eMsg;}catch(x){} throw new Error(eMsg); }
-      const d = await res.json();
-      return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const txt = await res.text();
+      console.log('[Gemini] status:', res.status, '| response snippet:', txt.slice(0,200));
+      if (!res.ok) {
+        let msg = `Gemini Error ${res.status}`;
+        try { msg = JSON.parse(txt).error?.message || msg; } catch(x) {}
+        throw new Error(msg);
+      }
+      const d = JSON.parse(txt);
+      return d.candidates?.[0]?.content?.parts?.[0]?.text || '(Gemini tidak memberikan respons)';
     }
 
     // ── GROQ ──
     if (config.provider === 'groq') {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEYS.groq}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${KEYS.groq}`
+        },
         body: JSON.stringify({
           model: config.apiModel,
           max_tokens: 4096,
-          messages: [{ role: 'system', content: systemPrompt }, ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }))]
+          temperature: 0.7,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages.map(m => ({
+              role: m.role === 'assistant' ? 'assistant' : 'user',
+              content: m.content
+            }))
+          ]
         })
       });
-      if (!res.ok) { const eText = await res.text(); let eMsg=`Groq Error ${res.status}`; try{const e=JSON.parse(eText);eMsg=e.error?.message||eMsg;}catch(x){} throw new Error(eMsg); }
-      const d = await res.json();
-      return d.choices?.[0]?.message?.content || '';
+      const txt = await res.text();
+      console.log('[Groq] status:', res.status, '| snippet:', txt.slice(0,200));
+      if (!res.ok) {
+        let msg = `Groq Error ${res.status}`;
+        try { msg = JSON.parse(txt).error?.message || msg; } catch(x) {}
+        throw new Error(msg);
+      }
+      return JSON.parse(txt).choices?.[0]?.message?.content || '(Groq tidak memberikan respons)';
     }
 
     // ── OPENROUTER ──
     if (config.provider === 'openrouter') {
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEYS.openrouter}`, 'HTTP-Referer': window.location.href, 'X-Title': 'NexusAI' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${KEYS.openrouter}`,
+          'HTTP-Referer': 'https://nexusai.app',
+          'X-Title': 'NexusAI',
+          'Origin': 'https://nexusai.app'
+        },
         body: JSON.stringify({
           model: config.apiModel,
           max_tokens: 4096,
-          messages: [{ role: 'system', content: systemPrompt }, ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }))]
+          temperature: 0.7,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages.map(m => ({
+              role: m.role === 'assistant' ? 'assistant' : 'user',
+              content: m.content
+            }))
+          ]
         })
       });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `OpenRouter Error ${res.status}`); }
-      const d = await res.json();
-      return d.choices?.[0]?.message?.content || '';
+      const txt = await res.text();
+      console.log('[OpenRouter] status:', res.status, '| snippet:', txt.slice(0,300));
+      if (!res.ok) {
+        let msg = `OpenRouter Error ${res.status}`;
+        try { msg = JSON.parse(txt).error?.message || msg; } catch(x) {}
+        throw new Error(msg);
+      }
+      const d = JSON.parse(txt);
+      const reply = d.choices?.[0]?.message?.content;
+      if (!reply) throw new Error('OpenRouter: Respons kosong. Model mungkin tidak tersedia, coba model lain.');
+      return reply;
     }
 
     // ── COHERE ──
     if (config.provider === 'cohere') {
-      const chatHistory = messages.slice(0, -1).map(m => ({
-        role: m.role === 'assistant' ? 'CHATBOT' : 'USER',
-        message: m.content
-      }));
-      const lastMsg = messages[messages.length - 1]?.content || '';
-      const res = await fetch('https://api.cohere.com/v1/chat', {
+      const allMsgs = [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.content
+        }))
+      ];
+      const res = await fetch('https://api.cohere.com/v2/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEYS.cohere}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${KEYS.cohere}`,
+          'X-Client-Name': 'NexusAI'
+        },
         body: JSON.stringify({
           model: config.apiModel,
-          message: lastMsg,
-          chat_history: chatHistory,
-          preamble: systemPrompt,
-          max_tokens: 4096
+          messages: allMsgs,
+          max_tokens: 4096,
+          temperature: 0.7
         })
       });
-      const cohereText = await res.text();
-      if (!res.ok) { 
-        let errMsg = `Cohere Error ${res.status}`;
-        try { const e = JSON.parse(cohereText); errMsg = e.message || e.detail || errMsg; } catch(x){}
-        throw new Error(errMsg); 
+      const txt = await res.text();
+      console.log('[Cohere] status:', res.status, '| snippet:', txt.slice(0,300));
+      if (!res.ok) {
+        let msg = `Cohere Error ${res.status}`;
+        try { msg = JSON.parse(txt).message || JSON.parse(txt).detail || msg; } catch(x) {}
+        throw new Error(msg);
       }
-      const d = JSON.parse(cohereText);
-      return d.text || '';
+      const d = JSON.parse(txt);
+      return d.message?.content?.[0]?.text || d.text || '(Cohere tidak memberikan respons)';
     }
 
     throw new Error('Provider tidak dikenal: ' + config.provider);
