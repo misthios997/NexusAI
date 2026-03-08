@@ -188,22 +188,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   <div class="model-sec">
     <div class="sec-label">Pilih Model</div>
     <select class="model-sel" id="model-select">
-      <optgroup label="Groq — Gratis + Cepat">
-        <option value="llama-3.3-70b" selected>LLaMA 3.3 70B</option>
-        <option value="llama-3.1-70b">LLaMA 3.1 70B</option>
-        <option value="llama-3.1-8b">LLaMA 3.1 8B Fast</option>
-        <option value="deepseek-r1-distill">DeepSeek R1 Distill</option>
-        <option value="gemma2-9b">Gemma 2 9B</option>
+      <optgroup label="⚡ Groq — Gratis">
+        <option value="llama-3.3-70b" selected>🔥 LLaMA 3.3 70B</option>
+        <option value="llama-3.1-70b">🦙 LLaMA 3.1 70B</option>
+        <option value="llama-3.1-8b">⚡ LLaMA 3.1 8B Fast</option>
+        <option value="deepseek-r1">🧠 DeepSeek R1</option>
+        <option value="gemma2-9b">💎 Gemma 2 9B</option>
+        <option value="qwen-qwq">🌟 Qwen QwQ 32B</option>
+        <option value="llama-4-scout">🦁 LLaMA 4 Scout</option>
       </optgroup>
-      <optgroup label="Google Gemini">
-        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+      <optgroup label="🌐 Google Gemini">
+        <option value="gemini-2.0-flash">🚀 Gemini 2.0 Flash</option>
+        <option value="gemini-1.5-flash">✨ Gemini 1.5 Flash</option>
       </optgroup>
-      <optgroup label="OpenRouter — Gratis">
-        <option value="deepseek-r1-free">DeepSeek R1</option>
-        <option value="llama-405b-free">Llama 3.1 405B</option>
+      <optgroup label="🤖 OpenRouter">
+        <option value="gpt-4o">💬 GPT-4o</option>
+        <option value="gpt-5">🔮 GPT-5</option>
+        <option value="claude-sonnet">🧡 Claude 3.5 Sonnet</option>
+        <option value="deepseek-r1-or">🧠 DeepSeek R1</option>
+        <option value="gemini-pro-or">🌐 Gemini 2.5 Pro</option>
       </optgroup>
-      <optgroup label="Cohere">
+      <optgroup label="🤝 Cohere">
         <option value="command-a">Command A</option>
       </optgroup>
     </select>
@@ -341,22 +346,31 @@ const db = getFirestore(app);
 
 const K = {
   groq:  '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',
-  gem:   'AIzaSyDeV_wok4wdmc6QVCuRHNnG24W0iTjCIjg',
-  or:    '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',
+  gem:   'AIzaSyBoR1MbuDTEjh-zy1ypEEFYd0YHCeRmPWA',
+  or:    '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',
   co:    'jH9AgpgGsQdXoFxLvUEccHFAIRLKIcwZq5ZNFlGy',
 };
 
 const MODELS = {
-  'llama-3.3-70b':       {name:'LLaMA 3.3 70B',       badge:'b-orange', p:'groq',   m:'llama-3.3-70b-versatile'},
-  'llama-3.1-70b':       {name:'LLaMA 3.1 70B',       badge:'b-orange', p:'groq',   m:'llama-3.1-70b-versatile'},
-  'llama-3.1-8b':        {name:'LLaMA 3.1 8B Fast',   badge:'b-orange', p:'groq',   m:'llama-3.1-8b-instant'},
-  'deepseek-r1-distill': {name:'DeepSeek R1 Distill', badge:'b-orange', p:'groq',   m:'deepseek-r1-distill-llama-70b'},
-  'gemma2-9b':           {name:'Gemma 2 9B',          badge:'b-blue',   p:'groq',   m:'gemma2-9b-it'},
-  'gemini-1.5-flash':    {name:'Gemini 1.5 Flash',    badge:'b-blue',   p:'gem',    m:'gemini-1.5-flash'},
-  'gemini-2.0-flash':    {name:'Gemini 2.0 Flash',    badge:'b-blue',   p:'gem',    m:'gemini-2.0-flash'},
-  'deepseek-r1-free':    {name:'DeepSeek R1',         badge:'b-orange', p:'or',     m:'deepseek/deepseek-r1:free'},
-  'llama-405b-free':     {name:'Llama 3.1 405B',      badge:'b-orange', p:'or',     m:'meta-llama/llama-3.1-405b-instruct:free'},
-  'command-a':           {name:'Command A',           badge:'b-purple', p:'co',     m:'command-a-03-2025'},
+  // GROQ - gratis, cepat, stabil
+  'llama-3.3-70b':     {name:'LLaMA 3.3 70B',      badge:'b-orange', p:'groq', m:'llama-3.3-70b-versatile'},
+  'llama-3.1-70b':     {name:'LLaMA 3.1 70B',      badge:'b-orange', p:'groq', m:'llama-3.1-70b-versatile'},
+  'llama-3.1-8b':      {name:'LLaMA 3.1 8B Fast',  badge:'b-orange', p:'groq', m:'llama-3.1-8b-instant'},
+  'deepseek-r1':       {name:'DeepSeek R1',        badge:'b-orange', p:'groq', m:'deepseek-r1-distill-llama-70b'},
+  'gemma2-9b':         {name:'Gemma 2 9B',         badge:'b-blue',   p:'groq', m:'gemma2-9b-it'},
+  'qwen-qwq':          {name:'Qwen QwQ 32B',       badge:'b-green',  p:'groq', m:'qwen-qwq-32b'},
+  'llama-4-scout':     {name:'LLaMA 4 Scout',      badge:'b-orange', p:'groq', m:'meta-llama/llama-4-scout-17b-16e-instruct'},
+  // GEMINI
+  'gemini-2.0-flash':  {name:'Gemini 2.0 Flash',   badge:'b-blue',   p:'gem',  m:'gemini-2.0-flash'},
+  'gemini-1.5-flash':  {name:'Gemini 1.5 Flash',   badge:'b-blue',   p:'gem',  m:'gemini-1.5-flash'},
+  // OPENROUTER
+  'gpt-4o':            {name:'GPT-4o',             badge:'b-green',  p:'or',   m:'openai/gpt-4o'},
+  'gpt-5':             {name:'GPT-5',              badge:'b-green',  p:'or',   m:'openai/gpt-5.2'},
+  'claude-sonnet':     {name:'Claude 3.5 Sonnet',  badge:'b-purple', p:'or',   m:'anthropic/claude-3.5-sonnet'},
+  'deepseek-r1-or':    {name:'DeepSeek R1 (OR)',   badge:'b-orange', p:'or',   m:'deepseek/deepseek-r1'},
+  'gemini-pro-or':     {name:'Gemini 2.5 Pro',     badge:'b-blue',   p:'or',   m:'google/gemini-2.5-pro-exp-03-25:free'},
+  // COHERE
+  'command-a':         {name:'Command A',          badge:'b-purple', p:'co',   m:'command-a-03-2025'},
 };
 
 let currentUser=null, chatId=null, history=[], attachedFiles=[], busy=false;
@@ -410,23 +424,52 @@ async function callAI(msgs) {
     const gm=[];
     for(const m of raw){const l=gm[gm.length-1];if(l&&l.role===m.role){l.parts[0].text+='\n'+m.parts[0].text;}else{gm.push({role:m.role,parts:[{text:m.parts[0].text}]});}}
     if(gm.length&&gm[0].role!=='user')gm.unshift({role:'user',parts:[{text:'.'}]});
-    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${cfg.m}:generateContent?key=${K.gem}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:gm,generationConfig:{maxOutputTokens:4096,temperature:0.7}})
-    });
-    const t=await r.text();
-    if(!r.ok){let e='Gemini Error '+r.status;try{e=JSON.parse(t).error?.message||e}catch(x){}throw new Error(e);}
-    return JSON.parse(t).candidates?.[0]?.content?.parts?.[0]?.text||'';
+    // Coba model utama, fallback ke gemini-1.5-flash jika gagal
+    const modelsToTry = [cfg.m, 'gemini-1.5-flash', 'gemini-1.0-pro'];
+    let lastErr = '';
+    for (const gemModel of modelsToTry) {
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${gemModel}:generateContent?key=${K.gem}`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:gm,generationConfig:{maxOutputTokens:4096,temperature:0.7}})
+      });
+      const t=await r.text();
+      if(r.ok){
+        const result=JSON.parse(t).candidates?.[0]?.content?.parts?.[0]?.text||'';
+        if(result) return result;
+      }
+      try{lastErr=JSON.parse(t).error?.message||'Gemini Error '+r.status;}catch(x){lastErr='Gemini Error '+r.status;}
+    }
+    throw new Error(lastErr||'Semua model Gemini gagal');
   }
 
   if (cfg.p === 'or') {
     const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+K.or,'HTTP-Referer':'https://nexusai.vercel.app','X-Title':'NexusAI'},
-      body:JSON.stringify({model:cfg.m,max_tokens:4096,messages:[{role:'system',content:sys},...msgs.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))]})
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+K.or,
+        'HTTP-Referer':'https://nexusai-eta-lime.vercel.app',
+        'X-Title':'NexusAI',
+        'X-Requested-With':'XMLHttpRequest'
+      },
+      body:JSON.stringify({
+        model:cfg.m,
+        max_tokens:4096,
+        temperature:0.7,
+        messages:[{role:'system',content:sys},...msgs.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))]
+      })
     });
     const t=await r.text();
-    if(!r.ok){let e='OpenRouter Error '+r.status;try{e=JSON.parse(t).error?.message||e}catch(x){}throw new Error(e);}
-    return JSON.parse(t).choices?.[0]?.message?.content||'';
+    if(!r.ok){
+      let e='OpenRouter Error '+r.status;
+      try{const j=JSON.parse(t);e=j.error?.message||j.message||e;}catch(x){}
+      // Jika rate limit, kasih pesan yang jelas
+      if(r.status===429)throw new Error('OpenRouter rate limit — coba lagi dalam beberapa detik');
+      if(r.status===402)throw new Error('OpenRouter kredit habis — pakai model Groq yang gratis');
+      throw new Error(e);
+    }
+    const j=JSON.parse(t);
+    return j.choices?.[0]?.message?.content||'';
   }
 
   if (cfg.p === 'co') {
