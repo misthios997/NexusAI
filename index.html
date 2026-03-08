@@ -978,6 +978,9 @@
     setupUser(user);
     await loadChatHistory();
     await startNewChat();
+    // Set model select to default
+    document.getElementById('model-select').value = currentModel;
+    window.onModelChange(currentModel);
   });
 
   function setupUser(user) {
@@ -1126,7 +1129,7 @@
           generationConfig: { maxOutputTokens: 4096, temperature: 0.7 }
         })
       });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `Gemini Error ${res.status}`); }
+      if (!res.ok) { const eText = await res.text(); let eMsg=`Gemini Error ${res.status}`; try{const e=JSON.parse(eText);eMsg=e.error?.message||eMsg;}catch(x){} throw new Error(eMsg); }
       const d = await res.json();
       return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
     }
@@ -1142,7 +1145,7 @@
           messages: [{ role: 'system', content: systemPrompt }, ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }))]
         })
       });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `Groq Error ${res.status}`); }
+      if (!res.ok) { const eText = await res.text(); let eMsg=`Groq Error ${res.status}`; try{const e=JSON.parse(eText);eMsg=e.error?.message||eMsg;}catch(x){} throw new Error(eMsg); }
       const d = await res.json();
       return d.choices?.[0]?.message?.content || '';
     }
@@ -1181,8 +1184,13 @@
           max_tokens: 4096
         })
       });
-      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message || `Cohere Error ${res.status}`); }
-      const d = await res.json();
+      const cohereText = await res.text();
+      if (!res.ok) { 
+        let errMsg = `Cohere Error ${res.status}`;
+        try { const e = JSON.parse(cohereText); errMsg = e.message || e.detail || errMsg; } catch(x){}
+        throw new Error(errMsg); 
+      }
+      const d = JSON.parse(cohereText);
       return d.text || '';
     }
 
@@ -1239,7 +1247,7 @@
       await saveMessage('assistant', aiResponse);
     } catch(e) {
       removeThinking(thinkingId);
-      const errMsg = `❌ Error: ${e.message}. Pastikan API key Anthropic sudah dikonfigurasi.`;
+      const errMsg = `❌ Error: ${e.message}`;
       renderMessage('ai', errMsg);
     } finally {
       isGenerating = false;
