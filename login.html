@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAI — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050508;
+    --surface: #0d0d14;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --glass: rgba(255,255,255,0.04);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Animated Background */
+  .bg-grid {
+    position: fixed; inset: 0;
+    background-image: 
+      linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: floatOrb 8s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(108,99,255,0.15), transparent 70%); top: -150px; left: -100px; }
+  .orb2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,101,132,0.1), transparent 70%); bottom: -100px; right: -100px; animation-delay: -4s; }
+  .orb3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(99,255,218,0.08), transparent 70%); top: 50%; left: 50%; animation-delay: -2s; }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+
+  /* Main Container */
+  .container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 460px;
+    padding: 20px;
+    animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Logo */
+  .logo {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 40px rgba(108,99,255,0.4);
+    font-size: 28px;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .logo-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 32px;
+    gap: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(108,99,255,0.4);
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  input::placeholder { color: rgba(255,255,255,0.2); }
+  input:focus {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.06);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+  }
+
+  /* Button */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108,99,255,0.5); }
+  .btn-primary:hover::before { opacity: 1; }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Google Button */
+  .btn-google {
+    width: 100%;
+    padding: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+  }
+  .btn-google:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+  .btn-google svg { width: 18px; height: 18px; }
+
+  /* Alert */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .alert.error { background: rgba(255,101,132,0.1); border: 1px solid rgba(255,101,132,0.3); color: #ff6584; }
+  .alert.success { background: rgba(99,255,218,0.1); border: 1px solid rgba(99,255,218,0.3); color: #63ffda; }
+  .alert.show { display: block; animation: shake 0.3s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  /* Models Preview */
+  .models-preview {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .models-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .models-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-claude { background: #6c63ff; box-shadow: 0 0 6px #6c63ff; }
+  .dot-gpt { background: #10a37f; box-shadow: 0 0 6px #10a37f; }
+  .dot-gemini { background: #4285f4; box-shadow: 0 0 6px #4285f4; }
+  .dot-deepseek { background: #ff6b35; box-shadow: 0 0 6px #ff6b35; }
+
+  /* Loading Spinner */
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Panel visibility */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Forgot password */
+  .forgot-link {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 18px;
+  }
+  .forgot-link a {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .forgot-link a:hover { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-mark">✦</div>
+    <div class="logo-text">NexusAI</div>
+    <div class="logo-sub">Multi-Model AI Platform — Gratis Selamanya</div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('login')">Masuk</button>
+      <button class="tab-btn" onclick="switchTab('register')">Daftar</button>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <!-- Login Panel -->
+    <div id="panel-login" class="panel active">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="kamu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="forgot-link"><a href="#" onclick="forgotPassword()">Lupa password?</a></div>
+      <button class="btn-primary" onclick="doLogin()" id="btn-login">Masuk ke NexusAI</button>
+      <div class="divider">atau</div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Lanjutkan dengan Google
+      </button>
+    </div>
+
+    <!-- Register Panel -->
+    <div id="panel-register" class="panel">
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="reg-name" placeholder="Nama kamu" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="kamu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-pass" placeholder="Min. 8 karakter" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" onclick="doRegister()" id="btn-register">Buat Akun Gratis</button>
+      <div class="divider">atau</div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Daftar dengan Google
+      </button>
+    </div>
+
+    <div class="models-preview">
+      <div class="models-label">Model yang tersedia</div>
+      <div class="models-chips">
+        <div class="chip"><span class="chip-dot dot-claude"></span>Claude Sonnet 4.6</div>
+        <div class="chip"><span class="chip-dot dot-claude"></span>Claude Opus 4.6</div>
+        <div class="chip"><span class="chip-dot dot-gpt"></span>GPT-5</div>
+        <div class="chip"><span class="chip-dot dot-gemini"></span>Gemini 3</div>
+        <div class="chip"><span class="chip-dot dot-deepseek"></span>DeepSeek</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile, sendPasswordResetEmail, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  // =============================================
+  // 🔧 GANTI DENGAN FIREBASE CONFIG KAMU
+  // =============================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDFWnGF4gG7nRrqwGAlxL-EOZiSPXs7kM",
+    authDomain: "chessorion-cb690.firebaseapp.com",
+    projectId: "chessorion-cb690",
+    storageBucket: "chessorion-cb690.firebasestorage.app",
+    messagingSenderId: "936378240439",
+    appId: "1:936378240439:web:7a578803271ea9b7a52c32",
+    measurementId: "G-EKJ7MJZ56Z"
+  };
+  // =============================================
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  // Auto-redirect jika sudah login
+  onAuthStateChanged(auth, (user) => {
+    if (user) window.location.href = 'index.html';
+  });
+
+  function showAlert(msg, type='error') {
+    const el = document.getElementById('alert');
+    el.textContent = msg;
+    el.className = `alert ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Memproses...';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = btnId === 'btn-login' ? 'Masuk ke NexusAI' : 'Buat Akun Gratis';
+    }
+  }
+
+  async function saveUserToFirestore(user, name='') {
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      email: user.email,
+      displayName: name || user.displayName || 'Pengguna',
+      photoURL: user.photoURL || '',
+      createdAt: serverTimestamp(),
+      plan: 'free'
+    }, { merge: true });
+  }
+
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+    document.getElementById('panel-login').classList.toggle('active', tab==='login');
+    document.getElementById('panel-register').classList.toggle('active', tab==='register');
+    document.getElementById('alert').classList.remove('show');
+  };
+
+  window.doLogin = async function() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    if (!email || !pass) return showAlert('Email dan password harus diisi');
+    setLoading('btn-login', true);
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      showAlert('Berhasil masuk! Mengarahkan...', 'success');
+      setTimeout(() => window.location.href='index.html', 800);
+    } catch(e) {
+      const msgs = { 'auth/user-not-found':'Email tidak ditemukan', 'auth/wrong-password':'Password salah', 'auth/too-many-requests':'Terlalu banyak percobaan, coba lagi nanti', 'auth/invalid-email':'Format email tidak valid', 'auth/invalid-credential':'Email atau password salah' };
+      showAlert(msgs[e.code] || e.message);
+    } finally { setLoading('btn-login', false); }
+  };
+
+  window.doRegister = async function() {
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    if (!name || !email || !pass) return showAlert('Semua field harus diisi');
+    if (pass.length < 8) return showAlert('Password minimal 8 karakter');
+    setLoading('btn-register', true);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      await saveUserToFirestore(cred.user, name);
+      showAlert('Akun berhasil dibuat!', 'success');
+      setTimeout(() => window.location.href='index.html', 800);
+    } catch(e) {
+      const msgs = { 'auth/email-already-in-use':'Email sudah terdaftar', 'auth/invalid-email':'Format email tidak valid', 'auth/weak-password':'Password terlalu lemah' };
+      showAlert(msgs[e.code] || e.message);
+    } finally { setLoading('btn-register', false); }
+  };
+
+  window.doGoogleLogin = async function() {
+    try {
+      const cred = await signInWithPopup(auth, googleProvider);
+      await saveUserToFirestore(cred.user);
+      window.location.href = 'index.html';
+    } catch(e) {
+      if (e.code !== 'auth/popup-closed-by-user') showAlert('Gagal login dengan Google: ' + e.message);
+    }
+  };
+
+  window.forgotPassword = async function() {
+    const email = document.getElementById('login-email').value.trim();
+    if (!email) return showAlert('Masukkan email dulu di kolom email');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showAlert('Email reset password sudah dikirim!', 'success');
+    } catch(e) { showAlert('Gagal mengirim email reset'); }
+  };
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const isLogin = document.getElementById('panel-login').classList.contains('active');
+      isLogin ? window.doLogin() : window.doRegister();
+    }
+  });
+</script>
+</body>
+</html>
