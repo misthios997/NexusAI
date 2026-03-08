@@ -443,33 +443,36 @@ async function callAI(msgs) {
   }
 
   if (cfg.p === 'or') {
-    const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+K.or,
-        'HTTP-Referer':'https://nexusai-eta-lime.vercel.app',
-        'X-Title':'NexusAI',
-        'X-Requested-With':'XMLHttpRequest'
+    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + K.or,
+        'HTTP-Referer': 'https://nexusai-eta-lime.vercel.app',
+        'X-OpenRouter-Title': 'NexusAI',
       },
-      body:JSON.stringify({
-        model:cfg.m,
-        max_tokens:4096,
-        temperature:0.7,
-        messages:[{role:'system',content:sys},...msgs.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))]
+      body: JSON.stringify({
+        model: cfg.m,
+        messages: [
+          {role:'system', content:sys},
+          ...msgs.map(m => ({
+            role: m.role === 'assistant' ? 'assistant' : 'user',
+            content: m.content
+          }))
+        ]
       })
     });
-    const t=await r.text();
-    if(!r.ok){
-      let e='OpenRouter Error '+r.status;
-      try{const j=JSON.parse(t);e=j.error?.message||j.message||e;}catch(x){}
-      // Jika rate limit, kasih pesan yang jelas
-      if(r.status===429)throw new Error('OpenRouter rate limit — coba lagi dalam beberapa detik');
-      if(r.status===402)throw new Error('OpenRouter kredit habis — pakai model Groq yang gratis');
+    const t = await r.text();
+    if (!r.ok) {
+      let e = 'OpenRouter Error ' + r.status;
+      try { const j = JSON.parse(t); e = j.error?.message || j.message || e; } catch(x) {}
+      if (r.status === 429) throw new Error('Rate limit — tunggu sebentar lalu coba lagi');
+      if (r.status === 402) throw new Error('Kredit OpenRouter habis');
+      if (r.status === 401) throw new Error('API key OpenRouter tidak valid');
       throw new Error(e);
     }
-    const j=JSON.parse(t);
-    return j.choices?.[0]?.message?.content||'';
+    const j = JSON.parse(t);
+    return j.choices?.[0]?.message?.content || '';
   }
 
   if (cfg.p === 'co') {
