@@ -4,771 +4,834 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NexusAI — Multi-Model Chat</title>
-<script src="https://js.puter.com/v2/"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #080810;
-    --surface: #0e0e1a;
-    --surface2: #13131f;
-    --border: rgba(255,255,255,0.07);
-    --text: #e8e8f0;
-    --muted: #6b6b80;
+    --surface: #0f0f1c;
+    --surface2: #16162a;
+    --border: rgba(255,255,255,0.08);
+    --text: #e2e2f0;
+    --muted: #5a5a72;
     --accent: #7c5cfc;
     --accent2: #fc5c7d;
     --accent3: #5cf0fc;
-    --glow: rgba(124,92,252,0.15);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
+  html, body {
+    height: 100%;
     background: var(--bg);
     color: var(--text);
     font-family: 'Syne', sans-serif;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
   }
 
-  /* Ambient background */
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background:
-      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,92,252,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 50% at 80% 80%, rgba(92,240,252,0.05) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 30% at 60% 30%, rgba(252,92,125,0.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
+      radial-gradient(ellipse 55% 35% at 15% 5%, rgba(124,92,252,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 45% at 85% 85%, rgba(92,240,252,0.04) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
   }
 
-  /* === HEADER === */
+  /* ─── LAYOUT ─── */
+  .app {
+    position: relative; z-index: 1;
+    height: 100vh;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── HEADER ─── */
   header {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(8,8,16,0.8);
-    backdrop-filter: blur(20px);
     flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,8,16,0.85);
+    backdrop-filter: blur(16px);
   }
 
   .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 9px;
+    font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
   }
 
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px; height: 28px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
   }
 
-  .logo span { color: var(--accent); }
+  .logo em { color: var(--accent); font-style: normal; }
 
-  /* === MODEL SELECTOR === */
-  .model-bar {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .model-btn {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .model-btn:hover {
-    border-color: rgba(124,92,252,0.5);
-    color: var(--text);
-    background: rgba(124,92,252,0.08);
-  }
-
-  .model-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(124,92,252,0.12);
-    box-shadow: 0 0 16px rgba(124,92,252,0.2);
-  }
-
-  .model-btn .dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    margin-right: 6px;
-    background: currentColor;
-    opacity: 0.6;
-  }
-
-  /* Provider group labels */
-  .provider-label {
-    font-size: 10px;
-    font-family: 'Space Mono', monospace;
-    color: var(--muted);
-    opacity: 0.5;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 0 4px;
-  }
-
-  .divider {
-    width: 1px;
-    height: 20px;
-    background: var(--border);
-    margin: 0 4px;
-  }
-
-  /* === CHAT AREA === */
-  .chat-wrapper {
+  /* ─── CHAT ─── */
+  .chat-wrap {
     flex: 1;
     overflow-y: auto;
-    position: relative;
-    z-index: 1;
     scroll-behavior: smooth;
   }
 
-  .chat-wrapper::-webkit-scrollbar { width: 4px; }
-  .chat-wrapper::-webkit-scrollbar-track { background: transparent; }
-  .chat-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .chat-wrap::-webkit-scrollbar { width: 3px; }
+  .chat-wrap::-webkit-scrollbar-thumb { background: rgba(124,92,252,0.2); border-radius: 2px; }
 
   .messages {
-    max-width: 820px;
+    max-width: 760px;
     margin: 0 auto;
-    padding: 32px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    padding: 28px 20px 16px;
+    display: flex; flex-direction: column; gap: 22px;
     min-height: 100%;
   }
 
-  /* Empty state */
-  .empty-state {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 60px 24px;
-    gap: 16px;
+  /* empty state */
+  .empty {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 14px; padding: 60px 20px;
   }
 
-  .empty-icon {
-    font-size: 48px;
-    opacity: 0.3;
-    filter: grayscale(1);
-  }
-
-  .empty-title {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    color: var(--text);
-    opacity: 0.4;
-  }
-
+  .empty-icon { font-size: 40px; opacity: 0.25; }
+  .empty-title { font-size: 26px; font-weight: 800; letter-spacing: -1px; opacity: 0.35; }
   .empty-sub {
     font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.6;
+    font-size: 11px; color: var(--muted); line-height: 1.7;
   }
 
-  .suggestion-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 8px;
-  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 4px; }
 
   .chip {
     font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
+    font-size: 11px; padding: 7px 13px;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    cursor: pointer; transition: all 0.18s;
   }
 
-  .chip:hover {
-    border-color: var(--accent);
-    color: var(--text);
-    transform: translateY(-1px);
-  }
+  .chip:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
 
-  /* Messages */
-  .msg {
-    display: flex;
-    gap: 12px;
-    animation: fadeUp 0.3s ease;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  /* messages */
+  .msg { display: flex; gap: 10px; animation: fadeUp 0.25s ease; }
   .msg.user { flex-direction: row-reverse; }
 
-  .msg-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-    margin-top: 2px;
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  .msg.user .msg-avatar {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
+  .av {
+    width: 30px; height: 30px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0; margin-top: 2px;
   }
 
-  .msg.ai .msg-avatar {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--accent);
+  .msg.user .av { background: linear-gradient(135deg, var(--accent), var(--accent2)); font-size: 14px; }
+  .msg.ai  .av {
+    background: var(--surface2); border: 1px solid var(--border);
+    font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; color: var(--accent);
   }
 
-  .msg-body { max-width: calc(100% - 48px); }
+  .msg-body { max-width: calc(100% - 44px); }
 
   .msg-meta {
     font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 10px; color: var(--muted);
+    margin-bottom: 5px;
+    display: flex; align-items: center; gap: 7px;
   }
 
   .msg.user .msg-meta { flex-direction: row-reverse; }
 
-  .model-tag {
-    background: rgba(124,92,252,0.15);
-    color: var(--accent);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 9px;
+  .mtag {
+    background: rgba(124,92,252,0.14); color: var(--accent);
+    padding: 1px 6px; border-radius: 4px; font-size: 9px;
   }
 
-  .msg-bubble {
-    padding: 14px 18px;
-    border-radius: 12px;
-    line-height: 1.7;
-    font-size: 14px;
+  .bubble {
+    padding: 12px 16px; border-radius: 12px;
+    line-height: 1.75; font-size: 14px;
   }
 
-  .msg.user .msg-bubble {
-    background: linear-gradient(135deg, rgba(124,92,252,0.2), rgba(252,92,125,0.1));
-    border: 1px solid rgba(124,92,252,0.2);
+  .msg.user .bubble {
+    background: linear-gradient(135deg, rgba(124,92,252,0.18), rgba(252,92,125,0.09));
+    border: 1px solid rgba(124,92,252,0.18);
     border-radius: 12px 2px 12px 12px;
-    text-align: right;
   }
 
-  .msg.ai .msg-bubble {
+  .msg.ai .bubble {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 2px 12px 12px 12px;
   }
 
-  .msg.ai .msg-bubble pre {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    padding: 12px;
-    border-radius: 6px;
-    overflow-x: auto;
-    margin: 8px 0;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
+  .bubble pre {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 10px 12px; border-radius: 6px;
+    overflow-x: auto; margin: 8px 0;
+    font-family: 'Space Mono', monospace; font-size: 11px;
   }
 
-  .msg.ai .msg-bubble code {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    background: rgba(124,92,252,0.1);
-    padding: 1px 5px;
-    border-radius: 3px;
-    color: var(--accent3);
+  .bubble code {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    background: rgba(124,92,252,0.1); padding: 1px 5px;
+    border-radius: 3px; color: var(--accent3);
   }
 
-  /* Typing indicator */
+  .bubble pre code { background: none; padding: 0; }
+
+  /* typing */
+  .typing-wrap { display: flex; gap: 10px; }
   .typing {
-    display: flex;
-    gap: 4px;
-    padding: 14px 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    display: flex; gap: 4px;
+    padding: 14px 16px;
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: 2px 12px 12px 12px;
-    width: fit-content;
   }
 
   .typing span {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: blink 1.2s infinite;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); animation: blink 1.2s infinite;
   }
 
-  .typing span:nth-child(2) { animation-delay: 0.2s; }
-  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
 
   @keyframes blink {
-    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
-    40% { opacity: 1; transform: scale(1.1); }
+    0%,80%,100% { opacity:.2; transform:scale(.8); }
+    40%          { opacity:1;  transform:scale(1.1); }
   }
 
-  /* === INPUT AREA === */
+  /* error */
+  .bubble.err { background: rgba(252,92,125,0.07)!important; border-color: rgba(252,92,125,0.2)!important; color: var(--accent2); }
+
+  /* ─── INPUT AREA ─── */
   .input-area {
-    position: relative;
-    z-index: 10;
     flex-shrink: 0;
-    padding: 16px 24px 20px;
-    background: rgba(8,8,16,0.9);
+    padding: 12px 20px 16px;
+    background: rgba(8,8,16,0.92);
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
   }
 
-  .input-wrapper {
-    max-width: 820px;
-    margin: 0 auto;
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
+  .input-inner {
+    max-width: 760px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .input-row {
+    display: flex; gap: 9px; align-items: flex-end;
   }
 
   .input-box {
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 12px 16px;
-    gap: 10px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    flex: 1; display: flex; align-items: flex-end;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 10px 14px; gap: 8px;
+    transition: border-color .2s, box-shadow .2s;
   }
 
   .input-box:focus-within {
-    border-color: rgba(124,92,252,0.4);
-    box-shadow: 0 0 0 3px rgba(124,92,252,0.06);
+    border-color: rgba(124,92,252,0.35);
+    box-shadow: 0 0 0 3px rgba(124,92,252,0.05);
   }
 
   textarea {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    resize: none;
-    min-height: 22px;
-    max-height: 160px;
-    line-height: 1.5;
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: 14px; resize: none;
+    min-height: 22px; max-height: 150px; line-height: 1.5;
   }
 
   textarea::placeholder { color: var(--muted); }
 
   .send-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: var(--accent);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; flex-shrink: 0;
   }
 
-  .send-btn:hover { background: #9170ff; transform: scale(1.05); }
-  .send-btn:active { transform: scale(0.95); }
-  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+  .send-btn:hover:not(:disabled) { background: #9170ff; transform: scale(1.05); }
+  .send-btn:active { transform: scale(.95); }
+  .send-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .send-btn svg { width: 15px; height: 15px; fill: white; }
 
-  .send-btn svg { width: 16px; height: 16px; fill: white; }
-
-  .input-footer {
-    max-width: 820px;
-    margin: 8px auto 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* ─── BOTTOM TOOLBAR ─── */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
   }
 
-  .current-model-indicator {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  .toolbar-left { display: flex; align-items: center; gap: 8px; }
+
+  /* Model picker button */
+  .model-pick-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; cursor: pointer;
+    transition: all .18s; font-family: 'Syne', sans-serif;
   }
 
-  .current-model-indicator::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s infinite;
+  .model-pick-btn:hover {
+    border-color: rgba(124,92,252,.4);
+    background: rgba(124,92,252,.07);
+  }
+
+  .model-pick-btn .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); animation: pulse 2s infinite;
   }
 
   @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    0%,100% { opacity:1; }
+    50%      { opacity:.3; }
   }
+
+  .model-pick-btn .name {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .model-pick-btn .arrow {
+    font-size: 10px; color: var(--muted); transition: transform .2s;
+  }
+
+  .model-pick-btn.open .arrow { transform: rotate(180deg); }
 
   .clear-btn {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: var(--muted); background: none; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: 5px; transition: all .15s;
+  }
+
+  .clear-btn:hover { color: var(--accent2); background: rgba(252,92,125,.07); }
+
+  .status {
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted);
+  }
+
+  /* ─── MODEL DRAWER ─── */
+  .drawer-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,.5); backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+
+  .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+  .drawer {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
+    background: #0d0d1e;
+    border-top: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 0 0 env(safe-area-inset-bottom, 16px);
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    max-height: 75vh; overflow-y: auto;
+  }
+
+  .drawer.open { transform: translateY(0); }
+
+  .drawer-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,.12);
+    margin: 12px auto 0;
+  }
+
+  .drawer-title {
+    font-size: 13px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 16px 20px 10px;
+  }
+
+  .provider-section { padding: 0 12px 16px; }
+
+  .provider-name {
     font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: all 0.15s;
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 8px 8px 6px;
+    opacity: .5;
   }
 
-  .clear-btn:hover { color: var(--accent2); background: rgba(252,92,125,0.08); }
-
-  /* Responsive */
-  @media (max-width: 640px) {
-    .model-bar { gap: 4px; }
-    .model-btn { padding: 4px 10px; font-size: 10px; }
-    .provider-label, .divider { display: none; }
-    .messages { padding: 16px 12px; }
+  .model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 6px;
   }
 
-  /* Error state */
-  .error-bubble {
-    background: rgba(252,92,125,0.08) !important;
-    border-color: rgba(252,92,125,0.2) !important;
-    color: var(--accent2);
+  .model-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 13px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; cursor: pointer; transition: all .18s;
+  }
+
+  .model-card:hover {
+    border-color: rgba(124,92,252,.35);
+    background: rgba(124,92,252,.07);
+  }
+
+  .model-card.active {
+    border-color: var(--accent);
+    background: rgba(124,92,252,.12);
+  }
+
+  .model-card .mc-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+
+  .model-card .mc-info { min-width: 0; }
+
+  .model-card .mc-name {
+    font-size: 12px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .model-card .mc-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .model-card.active .mc-name { color: var(--accent); }
+
+  .check { margin-left: auto; font-size: 14px; color: var(--accent); opacity: 0; }
+  .model-card.active .check { opacity: 1; }
+
+  /* scrollbar inside drawer */
+  .drawer::-webkit-scrollbar { width: 3px; }
+  .drawer::-webkit-scrollbar-thumb { background: rgba(124,92,252,.2); border-radius: 2px; }
+
+  @media (max-width: 500px) {
+    .model-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">✦</div>
-    Nexus<span>AI</span>
-  </div>
+<div class="app">
 
-  <div class="model-bar" id="modelBar">
-    <span class="provider-label">Anthropic</span>
-    <button class="model-btn active" data-model="claude-sonnet-4-6" data-label="Claude Sonnet 4.6">
-      <span class="dot"></span>Sonnet 4.6
-    </button>
-    <button class="model-btn" data-model="claude-opus-4-6" data-label="Claude Opus 4.6">
-      <span class="dot"></span>Opus 4.6
-    </button>
-    <button class="model-btn" data-model="claude-haiku-4-5" data-label="Claude Haiku 4.5">
-      <span class="dot"></span>Haiku 4.5
-    </button>
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      Nexus<em>AI</em>
+    </div>
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);">Powered by Puter.js</div>
+  </header>
 
-    <div class="divider"></div>
-    <span class="provider-label">OpenAI</span>
-    <button class="model-btn" data-model="gpt-4o" data-label="GPT-4o">
-      <span class="dot"></span>GPT-4o
-    </button>
-    <button class="model-btn" data-model="gpt-4o-mini" data-label="GPT-4o Mini">
-      <span class="dot"></span>4o Mini
-    </button>
-
-    <div class="divider"></div>
-    <span class="provider-label">Google</span>
-    <button class="model-btn" data-model="gemini-2.0-flash" data-label="Gemini 2.0 Flash">
-      <span class="dot"></span>Gemini 2.0
-    </button>
-
-    <div class="divider"></div>
-    <span class="provider-label">Meta</span>
-    <button class="model-btn" data-model="meta-llama/llama-3.1-8b-instruct:free" data-label="Llama 3.1 8B">
-      <span class="dot"></span>Llama 3.1
-    </button>
-
-    <div class="divider"></div>
-    <span class="provider-label">DeepSeek</span>
-    <button class="model-btn" data-model="deepseek-chat" data-label="DeepSeek V3">
-      <span class="dot"></span>DeepSeek V3
-    </button>
-  </div>
-</header>
-
-<div class="chat-wrapper" id="chatWrapper">
-  <div class="messages" id="messages">
-    <div class="empty-state" id="emptyState">
-      <div class="empty-icon">✦</div>
-      <div class="empty-title">NexusAI</div>
-      <div class="empty-sub">Multi-model AI chat · Powered by Puter.js<br>Pilih model di atas, lalu mulai percakapan</div>
-      <div class="suggestion-chips">
-        <div class="chip" onclick="sendSuggestion('Jelaskan quantum computing dengan sederhana')">⚛️ Quantum Computing</div>
-        <div class="chip" onclick="sendSuggestion('Tulis puisi tentang kecerdasan buatan')">✍️ Tulis Puisi</div>
-        <div class="chip" onclick="sendSuggestion('Buatkan fungsi Python untuk sorting data')">🐍 Kode Python</div>
-        <div class="chip" onclick="sendSuggestion('Apa perbedaan antara AI, ML, dan Deep Learning?')">🤖 Perbedaan AI/ML/DL</div>
-        <div class="chip" onclick="sendSuggestion('Rekomendasikan 5 buku terbaik tentang produktivitas')">📚 Rekomendasi Buku</div>
+  <!-- CHAT -->
+  <div class="chat-wrap" id="chatWrap">
+    <div class="messages" id="messages">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">✦</div>
+        <div class="empty-title">Tanya apa saja</div>
+        <div class="empty-sub">Pilih model AI di bawah · Gratis & tanpa API key</div>
+        <div class="chips">
+          <div class="chip" onclick="useSuggestion('Jelaskan quantum computing dengan sederhana')">⚛️ Quantum Computing</div>
+          <div class="chip" onclick="useSuggestion('Tulis puisi tentang kecerdasan buatan')">✍️ Tulis Puisi</div>
+          <div class="chip" onclick="useSuggestion('Buatkan fungsi Python untuk sorting')">🐍 Kode Python</div>
+          <div class="chip" onclick="useSuggestion('Perbedaan AI, ML, dan Deep Learning?')">🤖 AI vs ML vs DL</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="input-area">
-  <div class="input-wrapper">
-    <div class="input-box">
-      <textarea
-        id="inputField"
-        placeholder="Kirim pesan ke AI..."
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-      ></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-inner">
+      <div class="input-row">
+        <div class="input-box">
+          <textarea
+            id="inp"
+            placeholder="Kirim pesan..."
+            rows="1"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="send()">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <!-- Model picker button -->
+          <button class="model-pick-btn" id="modelPickBtn" onclick="toggleDrawer()">
+            <span class="dot"></span>
+            <span class="name" id="modelBtnLabel">Claude Sonnet 4.6</span>
+            <span class="arrow">▲</span>
+          </button>
+          <button class="clear-btn" onclick="clearChat()">↺ Bersihkan</button>
+        </div>
+        <div class="status" id="statusEl">Siap</div>
+      </div>
     </div>
   </div>
-  <div class="input-footer">
-    <div class="current-model-indicator" id="currentModelIndicator">claude-sonnet-4-6</div>
-    <button class="clear-btn" onclick="clearChat()">↺ Bersihkan</button>
+
+</div><!-- .app -->
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- MODEL DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">Pilih Model AI</div>
+
+  <div class="provider-section">
+    <div class="provider-name">🟣 Anthropic — Claude</div>
+    <div class="model-grid">
+      <div class="model-card active" data-model="claude-sonnet-4-6" data-label="Claude Sonnet 4.6" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#7c5cfc,#a07cff)">🤖</div>
+        <div class="mc-info">
+          <div class="mc-name">Sonnet 4.6</div>
+          <div class="mc-sub">Cerdas & Cepat</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="model-card" data-model="claude-opus-4-6" data-label="Claude Opus 4.6" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#5c3dfc,#7c5cfc)">🧠</div>
+        <div class="mc-info">
+          <div class="mc-name">Opus 4.6</div>
+          <div class="mc-sub">Paling Canggih</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="model-card" data-model="claude-haiku-4-5" data-label="Claude Haiku 4.5" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#a07cff,#c4a0ff)">⚡</div>
+        <div class="mc-info">
+          <div class="mc-name">Haiku 4.5</div>
+          <div class="mc-sub">Super Cepat</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </div>
   </div>
+
+  <div class="provider-section">
+    <div class="provider-name">🟢 OpenAI — GPT</div>
+    <div class="model-grid">
+      <div class="model-card" data-model="gpt-4o" data-label="GPT-4o" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#10a37f,#1ac994)">🌿</div>
+        <div class="mc-info">
+          <div class="mc-name">GPT-4o</div>
+          <div class="mc-sub">Multimodal</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="model-card" data-model="gpt-4o-mini" data-label="GPT-4o Mini" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#1ac994,#3de0b0)">🌱</div>
+        <div class="mc-info">
+          <div class="mc-name">GPT-4o Mini</div>
+          <div class="mc-sub">Ringan & Efisien</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-section">
+    <div class="provider-name">🔵 Google — Gemini</div>
+    <div class="model-grid">
+      <div class="model-card" data-model="gemini-2.0-flash" data-label="Gemini 2.0 Flash" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#4285f4,#34a853)">✨</div>
+        <div class="mc-info">
+          <div class="mc-name">Gemini 2.0</div>
+          <div class="mc-sub">Flash · Google</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="model-card" data-model="gemini-1.5-flash" data-label="Gemini 1.5 Flash" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#34a853,#5bc76c)">🔵</div>
+        <div class="mc-info">
+          <div class="mc-name">Gemini 1.5</div>
+          <div class="mc-sub">Flash</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-section">
+    <div class="provider-name">🟠 Meta — Llama</div>
+    <div class="model-grid">
+      <div class="model-card" data-model="meta-llama/llama-3.1-8b-instruct:free" data-label="Llama 3.1 8B" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#0064e0,#0096ff)">🦙</div>
+        <div class="mc-info">
+          <div class="mc-name">Llama 3.1 8B</div>
+          <div class="mc-sub">Open Source</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="model-card" data-model="meta-llama/llama-3.3-70b-instruct:free" data-label="Llama 3.3 70B" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#0096ff,#40b4ff)">🦙</div>
+        <div class="mc-info">
+          <div class="mc-name">Llama 3.3 70B</div>
+          <div class="mc-sub">Powerful</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-section">
+    <div class="provider-name">🔴 DeepSeek</div>
+    <div class="model-grid">
+      <div class="model-card" data-model="deepseek/deepseek-chat-v3-0324:free" data-label="DeepSeek V3" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#e05c00,#ff8c40)">🔴</div>
+        <div class="mc-info">
+          <div class="mc-name">DeepSeek V3</div>
+          <div class="mc-sub">0324</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+      <div class="model-card" data-model="deepseek/deepseek-r1:free" data-label="DeepSeek R1" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#c00,#ff4444)">🧮</div>
+        <div class="mc-info">
+          <div class="mc-name">DeepSeek R1</div>
+          <div class="mc-sub">Reasoning</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="provider-section">
+    <div class="provider-name">⚫ Mistral</div>
+    <div class="model-grid">
+      <div class="model-card" data-model="mistralai/mistral-7b-instruct:free" data-label="Mistral 7B" onclick="selectModel(this)">
+        <div class="mc-icon" style="background:linear-gradient(135deg,#ff7000,#ffab00)">🌪️</div>
+        <div class="mc-info">
+          <div class="mc-name">Mistral 7B</div>
+          <div class="mc-sub">Instruct</div>
+        </div>
+        <span class="check">✓</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:20px"></div>
 </div>
 
+<script src="https://js.puter.com/v2/"></script>
 <script>
+// ── State ──────────────────────────────────────────────
 let currentModel = 'claude-sonnet-4-6';
-let currentModelLabel = 'Claude Sonnet 4.6';
+let currentLabel = 'Claude Sonnet 4.6';
 let isLoading = false;
 let history = [];
 
-// Model selection
-document.querySelectorAll('.model-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentModel = btn.dataset.model;
-    currentModelLabel = btn.dataset.label;
-    document.getElementById('currentModelIndicator').textContent = currentModel;
-  });
-});
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+// ── Drawer ─────────────────────────────────────────────
+function toggleDrawer() {
+  const d = document.getElementById('drawer');
+  const o = document.getElementById('overlay');
+  const b = document.getElementById('modelPickBtn');
+  const open = d.classList.contains('open');
+  if (open) {
+    d.classList.remove('open');
+    o.classList.remove('open');
+    b.classList.remove('open');
+  } else {
+    d.classList.add('open');
+    o.classList.add('open');
+    b.classList.add('open');
   }
 }
 
-function sendSuggestion(text) {
-  document.getElementById('inputField').value = text;
-  sendMessage();
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('modelPickBtn').classList.remove('open');
 }
 
-function getModelInitials(model) {
-  if (model.includes('claude')) return 'CL';
-  if (model.includes('gpt')) return 'OAI';
-  if (model.includes('gemini')) return 'GG';
-  if (model.includes('llama')) return 'LL';
+function selectModel(card) {
+  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  currentModel = card.dataset.model;
+  currentLabel  = card.dataset.label;
+  document.getElementById('modelBtnLabel').textContent = currentLabel;
+  closeDrawer();
+}
+
+// ── Textarea ───────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function useSuggestion(t) {
+  document.getElementById('inp').value = t;
+  send();
+}
+
+// ── Message rendering ──────────────────────────────────
+function getInitials(model) {
+  if (model.includes('claude'))   return 'CL';
+  if (model.includes('gpt'))      return 'OAI';
+  if (model.includes('gemini'))   return 'GG';
+  if (model.includes('llama'))    return 'LL';
   if (model.includes('deepseek')) return 'DS';
-  if (model.includes('mistral')) return 'MS';
+  if (model.includes('mistral'))  return 'MS';
   return 'AI';
 }
 
-function appendMessage(role, content, modelName) {
-  const emptyState = document.getElementById('emptyState');
-  if (emptyState) emptyState.remove();
-
-  const messagesEl = document.getElementById('messages');
-  const msgEl = document.createElement('div');
-  msgEl.className = `msg ${role}`;
-
-  const initials = role === 'user' ? '👤' : getModelInitials(currentModel);
-  const timeStr = new Date().toLocaleTimeString('id', {hour:'2-digit', minute:'2-digit'});
-  const modelTag = role === 'ai' ? `<span class="model-tag">${modelName}</span>` : '';
-
-  msgEl.innerHTML = `
-    <div class="msg-avatar">${initials}</div>
-    <div class="msg-body">
-      <div class="msg-meta">${timeStr} ${modelTag}</div>
-      <div class="msg-bubble">${formatContent(content)}</div>
-    </div>
-  `;
-
-  messagesEl.appendChild(msgEl);
-  scrollToBottom();
-  return msgEl;
-}
-
-function formatContent(text) {
-  // Basic markdown-like formatting
-  return text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+function fmt(raw) {
+  return raw
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/\n/g, '<br>');
 }
 
-function showTyping() {
-  const messagesEl = document.getElementById('messages');
-  const typingEl = document.createElement('div');
-  typingEl.className = 'msg ai';
-  typingEl.id = 'typingIndicator';
-  typingEl.innerHTML = `
-    <div class="msg-avatar">${getModelInitials(currentModel)}</div>
+function addMsg(role, text, modelLabel, isErr) {
+  // remove empty state
+  const es = document.getElementById('emptyState');
+  if (es) es.remove();
+
+  const el = document.createElement('div');
+  el.className = `msg ${role}`;
+  const time = new Date().toLocaleTimeString('id', {hour:'2-digit', minute:'2-digit'});
+  const initials = role === 'user' ? '👤' : getInitials(currentModel);
+  const tag = role === 'ai' ? `<span class="mtag">${modelLabel}</span>` : '';
+
+  el.innerHTML = `
+    <div class="av">${initials}</div>
     <div class="msg-body">
-      <div class="msg-meta">${currentModelLabel}</div>
+      <div class="msg-meta">${time} ${tag}</div>
+      <div class="bubble${isErr?' err':''}">${fmt(text)}</div>
+    </div>`;
+
+  document.getElementById('messages').appendChild(el);
+  scrollDown();
+}
+
+function addTyping() {
+  const el = document.createElement('div');
+  el.id = 'typing';
+  el.className = 'msg ai';
+  el.innerHTML = `
+    <div class="av">${getInitials(currentModel)}</div>
+    <div class="msg-body">
+      <div class="msg-meta">${currentLabel}</div>
       <div class="typing"><span></span><span></span><span></span></div>
-    </div>
-  `;
-  messagesEl.appendChild(typingEl);
-  scrollToBottom();
+    </div>`;
+  document.getElementById('messages').appendChild(el);
+  scrollDown();
 }
 
 function removeTyping() {
-  const el = document.getElementById('typingIndicator');
+  const el = document.getElementById('typing');
   if (el) el.remove();
 }
 
-function scrollToBottom() {
-  const wrapper = document.getElementById('chatWrapper');
-  wrapper.scrollTop = wrapper.scrollHeight;
+function scrollDown() {
+  const w = document.getElementById('chatWrap');
+  w.scrollTop = w.scrollHeight;
 }
 
-async function sendMessage() {
+function setStatus(t) {
+  document.getElementById('statusEl').textContent = t;
+}
+
+// ── Send ───────────────────────────────────────────────
+async function send() {
   if (isLoading) return;
-  const input = document.getElementById('inputField');
-  const text = input.value.trim();
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
   if (!text) return;
 
-  input.value = '';
-  input.style.height = 'auto';
+  inp.value = ''; inp.style.height = 'auto';
   isLoading = true;
   document.getElementById('sendBtn').disabled = true;
+  setStatus('Mengirim...');
 
-  appendMessage('user', text, null);
-  history.push({ role: 'user', content: text });
+  addMsg('user', text, null);
+  history.push({ role:'user', content: text });
 
-  showTyping();
+  addTyping();
 
   try {
-    // Build messages for context
-    const messages = history.map(m => `${m.role === 'user' ? 'Human' : 'Assistant'}: ${m.content}`).join('\n');
+    // Build prompt with history
+    let prompt = text;
+    if (history.length > 1) {
+      const ctx = history.slice(0, -1)
+        .map(m => (m.role === 'user' ? 'Human' : 'Assistant') + ': ' + m.content)
+        .join('\n');
+      prompt = ctx + '\nHuman: ' + text;
+    }
 
-    const response = await puter.ai.chat(
-      history.length > 1
-        ? `Previous conversation:\n${history.slice(0,-1).map(m=>`${m.role==='user'?'Human':'Assistant'}: ${m.content}`).join('\n')}\n\nHuman: ${text}`
-        : text,
-      { model: currentModel, stream: false }
-    );
+    setStatus('Memproses...');
+
+    const res = await puter.ai.chat(prompt, {
+      model: currentModel,
+      stream: false
+    });
 
     removeTyping();
 
+    // Parse response — handle all possible shapes
     let aiText = '';
-    if (response?.message?.content) {
-      if (Array.isArray(response.message.content)) {
-        aiText = response.message.content.map(c => c.text || '').join('');
-      } else {
-        aiText = response.message.content;
-      }
-    } else if (response?.text) {
-      aiText = response.text;
-    } else if (typeof response === 'string') {
-      aiText = response;
+    if (typeof res === 'string') {
+      aiText = res;
+    } else if (res?.message?.content) {
+      const c = res.message.content;
+      aiText = Array.isArray(c) ? c.map(x => x.text || '').join('') : String(c);
+    } else if (res?.text) {
+      aiText = res.text;
+    } else if (res?.choices?.[0]?.message?.content) {
+      aiText = res.choices[0].message.content;
     } else {
-      aiText = JSON.stringify(response);
+      aiText = JSON.stringify(res);
     }
 
-    history.push({ role: 'assistant', content: aiText });
-    appendMessage('ai', aiText, currentModelLabel);
+    history.push({ role:'assistant', content: aiText });
+    addMsg('ai', aiText, currentLabel, false);
+    setStatus('Siap');
 
   } catch (err) {
     removeTyping();
-    const messagesEl = document.getElementById('messages');
-    const errEl = document.createElement('div');
-    errEl.className = 'msg ai';
-    errEl.innerHTML = `
-      <div class="msg-avatar">⚠</div>
-      <div class="msg-body">
-        <div class="msg-meta">${currentModelLabel} · Error</div>
-        <div class="msg-bubble error-bubble">
-          Gagal mendapatkan respons dari model ini.<br>
-          <small style="opacity:0.6;font-family:monospace;font-size:11px">${err.message || err}</small>
-        </div>
-      </div>
-    `;
-    messagesEl.appendChild(errEl);
-    scrollToBottom();
+    const msg = err?.message || String(err) || 'Unknown error';
+    addMsg('ai', `Gagal mendapat respons dari **${currentLabel}**.\n\`${msg}\``, currentLabel, true);
+    setStatus('Error');
   }
 
   isLoading = false;
   document.getElementById('sendBtn').disabled = false;
-  input.focus();
+  document.getElementById('inp').focus();
 }
 
+// ── Clear ──────────────────────────────────────────────
 function clearChat() {
   history = [];
-  const messagesEl = document.getElementById('messages');
-  messagesEl.innerHTML = `
-    <div class="empty-state" id="emptyState">
+  document.getElementById('messages').innerHTML = `
+    <div class="empty" id="emptyState">
       <div class="empty-icon">✦</div>
-      <div class="empty-title">NexusAI</div>
-      <div class="empty-sub">Multi-model AI chat · Powered by Puter.js<br>Pilih model di atas, lalu mulai percakapan</div>
-      <div class="suggestion-chips">
-        <div class="chip" onclick="sendSuggestion('Jelaskan quantum computing dengan sederhana')">⚛️ Quantum Computing</div>
-        <div class="chip" onclick="sendSuggestion('Tulis puisi tentang kecerdasan buatan')">✍️ Tulis Puisi</div>
-        <div class="chip" onclick="sendSuggestion('Buatkan fungsi Python untuk sorting data')">🐍 Kode Python</div>
-        <div class="chip" onclick="sendSuggestion('Apa perbedaan antara AI, ML, dan Deep Learning?')">🤖 Perbedaan AI/ML/DL</div>
-        <div class="chip" onclick="sendSuggestion('Rekomendasikan 5 buku terbaik tentang produktivitas')">📚 Rekomendasi Buku</div>
+      <div class="empty-title">Tanya apa saja</div>
+      <div class="empty-sub">Pilih model AI di bawah · Gratis & tanpa API key</div>
+      <div class="chips">
+        <div class="chip" onclick="useSuggestion('Jelaskan quantum computing dengan sederhana')">⚛️ Quantum Computing</div>
+        <div class="chip" onclick="useSuggestion('Tulis puisi tentang kecerdasan buatan')">✍️ Tulis Puisi</div>
+        <div class="chip" onclick="useSuggestion('Buatkan fungsi Python untuk sorting')">🐍 Kode Python</div>
+        <div class="chip" onclick="useSuggestion('Perbedaan AI, ML, dan Deep Learning?')">🤖 AI vs ML vs DL</div>
       </div>
-    </div>
-  `;
+    </div>`;
+  setStatus('Siap');
 }
 </script>
+
 </body>
 </html>
